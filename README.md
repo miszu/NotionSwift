@@ -15,14 +15,14 @@ For more details and documentation please check [Notion Developer Portal](https:
 ### CocoaPods
 
 ```ruby
-pod 'NotionSwift', '0.8.0'
+pod 'NotionSwift', '0.9.0'
 ```
 
 ### Swift Package Manager
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/chojnac/NotionSwift.git", .upToNextMajor(from: "0.8.0"))
+    .package(url: "https://github.com/chojnac/NotionSwift.git", .upToNextMajor(from: "0.9.0"))
 ]
 ```
 
@@ -62,7 +62,7 @@ In theory, search allows filtering results by object type. However, currently, t
 To narrow search results,  use code snippet belove. 
 
 ```swift
-// fetch avaiable databases
+// fetch available databases
 notion.search(request: .init(filter: .database)) { result in
     let databases = result.map { objects in
         objects.results.compactMap({ object -> Database? in
@@ -153,7 +153,7 @@ let request = PageCreateRequest(
             type: .title([
                 .init(string: "Lorem ipsum \(Date())")
             ])
-        )
+        ),
         "Field 10": .init(
             type: .richText([
                 .init(string: "dolor sit amet")
@@ -227,7 +227,7 @@ notion.pageCreate(request: request) {
 let pageId = Page.Identifier("{PAGE UUIDv4}")
 
 // update title property
-let request = PageProperiesUpdateRequest(
+let request = PageUpdateRequest(
     properties: [
         .name("title"): .init(
             type: .title([
@@ -237,7 +237,20 @@ let request = PageProperiesUpdateRequest(
     ]
 )
 
-notion.pageUpdateProperties(pageId: pageId, request: request) {
+notion.pageUpdate(pageId: pageId, request: request) {
+    print($0)
+}
+```
+
+### Delete page 
+
+```swift
+let pageId = Page.Identifier("{PAGE UUIDv4}")
+
+// Archive page (trash a page)
+let request = PageUpdateRequest(archived: true)
+
+notion.pageUpdate(pageId: pageId, request: request) {
     print($0)
 }
 ```
@@ -311,7 +324,7 @@ let text: [RichText] = [
     "Current time: ",
     .init(string: Date().description, annotations: .bold)
 ]
-let block = UpdateBlock(value: .paragraph(text: text))
+let block = UpdateBlock(type: .paragraph(text: text))
 notion.blockUpdate(blockId: blockId, value: block) {
     print("Updated: ", $0)
 }
